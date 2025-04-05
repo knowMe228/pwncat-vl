@@ -35,6 +35,7 @@ import datetime
 import tempfile
 import threading
 import contextlib
+import importlib.util
 from io import TextIOWrapper
 from enum import Enum, auto
 from typing import Dict, List, Tuple, Union, Callable, Optional, Generator
@@ -932,9 +933,12 @@ class Manager:
             paths, prefix="pwncat.modules."
         ):
 
-            # Why is this check *not* part of pkgutil??????? D:<
             if module_name not in sys.modules:
-                module = loader.find_module(module_name).load_module(module_name)
+                spec = importlib.util.find_spec(module_name)
+                if spec is None:
+                    continue
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
             else:
                 module = sys.modules[module_name]
 
