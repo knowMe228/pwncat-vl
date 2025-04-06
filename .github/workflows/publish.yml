@@ -21,7 +21,7 @@ jobs:
           python-version: "3.9"
       - name: Installing Python Poetry
         run: pip install poetry
-      - name: Install and Build pwncat-cs Package
+      - name: Install and Build pwncat-vl Package
         run: |
           poetry install
           poetry build
@@ -35,7 +35,7 @@ jobs:
       - name: Download and Archive Plugins
         run: |
           # Have pwncat download all plugins needed
-          poetry run pwncat-cs --download-plugins
+          poetry run pwncat-vl --download-plugins
 
           # They are stored in ~/.local/share/pwncat by default
           tar czvf pwncat-plugins.tar.gz --transform='s|.*pwncat/||' ~/.local/share/pwncat/*
