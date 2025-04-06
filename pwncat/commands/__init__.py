@@ -647,6 +647,10 @@ class CommandParser:
             else:
                 if argv[0] in self.aliases:
                     command = self.aliases[argv[0]]
+                    if isinstance(command, str):
+                        self.dispatch_line(f"{command} {' '.join(argv[1:])}".strip())
+                        return
+
                 else:
                     self.manager.log(f"[red]error[/red]: {argv[0]}: unknown command")
                     return

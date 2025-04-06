@@ -11,18 +11,14 @@ class Command(CommandDefinition):
     alias if it exists.
     """
 
-    def get_command_names(self):
-        return [c.PROG for c in self.manager.parser.commands]
-
     PROG = "alias"
     ARGS = {
         "alias": Parameter(Complete.NONE, help="name for the new alias", nargs="?"),
         "command": Parameter(
-            Complete.CHOICES,
+            Complete.NONE,
             metavar="COMMAND",
-            choices=get_command_names,
             help="the command the new alias will use",
-            nargs="?",
+            nargs="*",
         ),
     }
     LOCAL = True
@@ -30,13 +26,13 @@ class Command(CommandDefinition):
     def run(self, manager, args):
         if args.alias is None:
             for name, command in manager.parser.aliases.items():
-                console.print(
-                    f" [cyan]{name}[/cyan] \u2192 [yellow]{command.PROG}[/yellow]"
-                )
-        elif args.command is not None:
-            # This is safe because of "choices" in the argparser
-            manager.parser.aliases[args.alias] = [
-                c for c in manager.parser.commands if c.PROG == args.command
-            ][0]
+                console.print(f" [cyan]{name}[/cyan] \u2192 [yellow]{command}[/yellow]")
+        elif args.command:
+            full_command = " ".join(args.command)
+            manager.parser.aliases[args.alias] = full_command
         else:
-            del manager.parser.aliases[args.alias]
+            if args.alias in manager.parser.aliases:
+                del manager.parser.aliases[args.alias]
+                console.log(f"Alias '{args.alias}' removed")
+            else:
+                console.log(f"[yellow]Alias '{args.alias}' not found[/yellow]")

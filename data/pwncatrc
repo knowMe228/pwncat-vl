@@ -21,6 +21,8 @@ bind c "set state command"
 # Create aliases for commands
 alias up upload
 alias down download
+alias clear "local clear"
+alias cls "local clear"
 
 # Shortcuts allow single-character prefix which indicate the entire command
 # string be passed as the arguments to a specific command. For example:
