@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from packaging.version import parse, InvalidVersion
+from packaging.version import InvalidVersion, parse
 
 import pwncat
 from pwncat.facts import build_gtfo_ability

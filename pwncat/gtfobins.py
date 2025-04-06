@@ -6,6 +6,7 @@ database to identify ways to read/write files as well as during escalation
 with things like SETUID binaries and sudo rules. A full list of all supported
 binaries can be seen in ``pwncat/data/gtfobins.json``.
 """
+
 import os
 import shlex
 from enum import Flag, auto
@@ -18,11 +19,11 @@ class ControlCodes:
     CTRL_C = "\x03"
     CTRL_X = "\x18"
     CTRL_R = "\x12"
-    CTRL_O = "\x0F"
+    CTRL_O = "\x0f"
     CTRL_T = "\x14"
     CTRL_Z = "\x1a"
     CTRL_D = "\x04"
-    ESCAPE = "\x1B"
+    ESCAPE = "\x1b"
 
 
 class SudoNotPossible(Exception):

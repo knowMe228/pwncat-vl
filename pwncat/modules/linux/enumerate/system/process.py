@@ -8,7 +8,6 @@ from pwncat.modules.enumerate import Schedule, EnumerateModule
 
 
 class ProcessData(Fact):
-
     """A single process from the `ps` output"""
 
     def __init__(self, source, uid, username, pid, ppid, argv):

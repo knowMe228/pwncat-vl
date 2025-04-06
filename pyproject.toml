@@ -10,24 +10,24 @@ testpaths = [
 addopts = "-v"
 
 [tool.poetry]
-name = "pwncat-cs"
+name = "pwncat-vl"
 version = "0.5.5"
-description = "Reverse and bind shell automation framework"
-authors = ["Caleb Stewart <caleb.stewart94@gmail.com>", "John Hammond"]
+description = "Community-maintained fork of pwncat with Python 3.13+ support"
+authors = ["Chocapikk <balgogan@protonmail.com>", "Caleb Stewart <caleb.stewart94@gmail.com>", "John Hammond"]
 readme = "README.md"
-repository = "https://github.com/calebstewart/pwncat"
+repository = "https://github.com/Chocapikk/pwncat-vl"
 documentation = "https://pwncat.readthedocs.io"
-keywords = ["offsec", "cyber", "exploitation", "privesc", "automation"]
+keywords = ["offsec", "cyber", "exploitation", "privesc", "automation", "redteam"]
 packages = [
   { include = "pwncat" },
 ]
 license = "MIT"
 
 [tool.poetry.scripts]
-pwncat-cs = "pwncat.__main__:main"
+pwncat-vl = "pwncat.__main__:main"
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/calebstewart/pwncat/issues"
+"Bug Tracker" = "https://github.com/Chocapikk/pwncat-vl/issues"
 
 [tool.poetry.dependencies]
 python = "^3.9"

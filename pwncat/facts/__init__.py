@@ -4,6 +4,7 @@ used for multiple platforms, so they were separated out here. You
 should not generally need to use these types except as reference
 when interacting with data returned by an enumeration module.
 """
+
 import time
 import subprocess
 from io import StringIO

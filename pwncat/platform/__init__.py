@@ -27,6 +27,7 @@ a session-specific path object by utilizing the ``session.platform.Path`` proper
     print(path.read_text())
 
 """
+
 import os
 import sys
 import stat

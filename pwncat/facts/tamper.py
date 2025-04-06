@@ -5,6 +5,7 @@ modifications have been made, and in some cases provide the ability
 to revert those modifications. This is not foolproof, but provides
 some ability to track your changes when on target.
 """
+
 import datetime
 from typing import Union, Optional
 

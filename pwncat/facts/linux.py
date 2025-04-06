@@ -2,6 +2,7 @@
 Linux specific facts which are used in multiple places throughout
 the framework.
 """
+
 from typing import List, Optional
 
 from pwncat.facts import User, Group

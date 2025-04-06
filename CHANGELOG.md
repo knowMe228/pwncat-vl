@@ -4,16 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The Changelog starts with v0.4.1, because we did not keep one before that,
-and simply didn't have the time to go back and retroactively create one.
-
-## [Unreleased]
-### Fixed
-- Fixed `shlex.join` use with non-str type objects (e.g. `RemotePath`)
-- Fixed `set` command use with incorrect keys (e.g. `set invalid value`)
-
+## [0.5.5] - 2023-04-06
 ### Added
-- Added missed `PlatformError` for `upload` command (e.g. "no gtfobins writers available")
+- Added support for recursive directory downloads in the `download` command. Now, the contents
+  (and subdirectories) of a remote directory are downloaded into the specified destination
+  without duplicating the base directory.
+- Prevented infinite recursion by skipping \u201c.\u201d and \u201c..\u201d entries and using a visited set.
+- Marked the initial release of the hard fork, introducing these new features and improvements.
+
+### Changed
+- Applied code formatting improvements using isort and Black.
+- Minor refactoring for improved readability.
 
 ## [0.5.4] - 2022-01-27
 Bug fix for the `load` command.

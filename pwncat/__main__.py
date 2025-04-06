@@ -101,7 +101,7 @@ def main():
 
     # Print the version number and exit.
     if args.version:
-        print(importlib.metadata.version("pwncat-cs"))
+        print(importlib.metadata.version("pwncat-vl"))
         return
 
     # Create the session manager
@@ -233,15 +233,11 @@ def main():
             if query_args["certfile"] is not None or query_args["keyfile"] is not None:
                 query_args["ssl"] = True
 
-            if (
-                query_args["protocol"]
-                not in [
-                    None,
-                    "bind",
-                    "connect",
-                ]
-                and query_args.get("ssl")
-            ):
+            if query_args["protocol"] not in [
+                None,
+                "bind",
+                "connect",
+            ] and query_args.get("ssl"):
                 console.log(
                     f"[red]error[/red]: --ssl is incompatible with an [yellow]{query_args['protocol']}[/yellow] protocol"
                 )

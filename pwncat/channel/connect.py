@@ -6,6 +6,7 @@ connection on a known port.
 
 The only required arguments are ``host`` and ``port``.
 """
+
 import socket
 
 from rich.progress import Progress, BarColumn

@@ -12,21 +12,21 @@ The only system dependency for pwncat is ``python3`` and ``pip``. For ``pip`` to
     # A virtual environment is recommended
     python -m venv /opt/pwncat
     # Install pwncat within the virtual environment
-    /opt/pwncat/bin/pip install pwncat-cs
+    /opt/pwncat/bin/pip install pwncat-vl
     # This allows you to use pwncat outside of the virtual environment
-    ln -s /opt/pwncat/bin/pwncat-cs /usr/local/bin
+    ln -s /opt/pwncat/bin/pwncat-vl /usr/local/bin
 
 .. code-block:: bash
     :caption: Install pwncat without Virtual Environment
 
-    pip install pwncat-cs
+    pip install pwncat-vl
 
 After installation, you can use pwncat via the installed script:
 
 .. code-block:: bash
 
-    $ pwncat-cs --help
-    usage: pwncat-cs [-h] [--version] [--download-plugins] [--config CONFIG] [--ssl] [--ssl-cert SSL_CERT]
+    $ pwncat-vl --help
+    usage: pwncat-vl [-h] [--version] [--download-plugins] [--config CONFIG] [--ssl] [--ssl-cert SSL_CERT]
                      [--ssl-key SSL_KEY] [--identity IDENTITY] [--listen] [--platform PLATFORM] [--port PORT] [--list]
                      [[protocol://][user[:password]@][host][:port]] [port]
 

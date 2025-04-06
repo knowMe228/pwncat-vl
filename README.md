@@ -1,47 +1,79 @@
-# pwncat
+# pwncat-vl
 
 [![asciicast](https://asciinema.org/a/417930.svg)](https://asciinema.org/a/417930)
 
-pwncat is a post-exploitation platform ~~for Linux targets~~. It started out as a
-wrapper around basic bind and reverse shells and has grown from there. It
-streamlines common red team operations while staging code from your attacker
-machine, not the target.
+**pwncat-vl** is a community-maintained fork of [pwncat-cs](https://github.com/calebstewart/pwncat),  
+revived to support **modern Python versions (3.13+)** and ensure the tool remains usable for current red team workflows.
 
-pwncat used to only support Linux, but there has been a lot of work recently
-to support multiple platforms. Currently, there is alpha support for Windows
-targets. Please see the latest [documentation] for details on how to use
-pwncat with a Windows target.
+---
+
+Originally created by [@calebstewart](https://github.com/calebstewart), `pwncat` is a post-exploitation platform ~~for Linux targets~~.  
+It started out as a wrapper around basic bind and reverse shells and has grown from there. It streamlines common red team operations while staging code from your attacker machine, not the target.
+
+The original project has been unmaintained since 2021, and despite community interest and open pull requests, no updates were made.  
+Rather than let the project fade away, this fork was created to **fix critical issues, restore compatibility, and keep contributions alive**.
+
+### Key changes in this fork:
+- Python **3.13 compatibility**
+- Updated dependencies for modern environments
+- Minimal but active maintenance (contributions welcome!)
+
+---
+
+### Features
 
 pwncat intercepts the raw communication with a remote shell and allows the
 user to perform automated actions on the remote host including enumeration,
 implant installation and even privilege escalation.
 
-After receiving a connection, pwncat will setup some common configurations
-for working with remote shells.
+After receiving a connection, pwncat will configure the remote shell:
 
-- Disable history in the remote shell
+- Disable shell history
 - Normalize shell prompt
 - Locate useful binaries (using `which`)
-- Attempt to spawn a pseudo-terminal (pty) for a full interactive session
+- Attempt to spawn a pseudo-terminal (pty) for full interactive sessions
 
-`pwncat` knows how to spawn pty's with a few different methods and will
-cross-reference the methods with the executables previously enumerated. After
-spawning a pty, it will setup the controlling terminal in raw mode, so you can
-interact in a similar fashion to `ssh`.
+`pwncat` supports multiple methods for spawning PTYs and cross-references them with available executables on the target system.  
+After spawning a PTY, it sets the terminal in raw mode to mimic the behavior of an `ssh` session.
 
-`pwncat` will also synchronize the remote pty settings (such as rows, columns,
-`TERM` environment variable) with your local settings to ensure the shell
-behaves correctly with interactive applications such as `vim` or `nano`.
+It also synchronizes the remote PTY settings (rows, columns, `TERM`) with your local terminal to ensure proper behavior of interactive applications like `vim` or `nano`.
 
-John Hammond and I presented `pwncat` at GRIMMCon. Our presentation, which
-can be found on YouTube [here](https://www.youtube.com/watch?v=CISzI9klRkw).
-This video demonstrates an early version of the API and interface. Please
-refer to the documentation for up to date usage and API documentation!
+---
 
-pwncat [documentation] is being built out on Read the Docs. Head there for
-the latest usage and development documentation!
+### Platform Support
 
-**pwncat requires Python 3.9+ on Linux**
+`pwncat` was initially Linux-only, but the original maintainers began introducing **alpha support for Windows targets**.  
+This fork continues to support these efforts but does not introduce new Windows features (yet).
+
+---
+
+### Presentation
+
+John Hammond and Caleb Stewart presented `pwncat` at GRIMMCon.  
+You can find the video here: [YouTube link](https://www.youtube.com/watch?v=CISzI9klRkw).  
+This shows an early version \u2014 for current details, refer to this repository.
+
+---
+
+### Requirements
+
+- Python **3.9 to 3.13+**
+- Linux (primary support)
+- pip / virtualenv recommended
+
+---
+
+### Documentation
+
+Official documentation for the original project was hosted on Read the Docs.  
+This fork does not (yet) include RTD integration, but usage remains very similar. Updated instructions are in progress.
+
+---
+
+## Disclaimer  
+This fork is not affiliated with the original author. It exists solely to keep a useful tool alive,  
+with full respect and credit given to the original work. Contributions are welcome, and maintenance is ongoing as time permits.
+
 
 ## Installation
 
@@ -52,28 +84,29 @@ this is `python-dev`. For Arch, the development files are shipped with the
 main Python repository. For Enterprise Linux, the package is named
 `python-devel`.
 
-`pwncat` is pushed to PyPI under the name `pwncat-cs`, and can be installed with
-`pip` like so:
+You can install `pwncat-vl` easily using `pipx` (recommended if you want isolation without managing virtualenvs manually):
 
-``` shell
-pip install pwncat-cs
+```bash
+pipx install git+https://github.com/Chocapikk/pwncat-vl
 ```
 
-However, it is recommended to install pwncat from a virtual environment.
+If you prefer manual installation from source:
 
-```shell script
-python3 -m venv pwncat-env
-source pwncat-env/bin/activate
-pip install pwncat-cs
+```shell
+git clone https://github.com/Chocapikk/pwncat-vl.git
+cd pwncat-vl
+python3 -m venv venv
+source venv/bin/activate
+pip install .
 ```
 
-For a development environment, `pwncat` usage Python Poetry. You can clone the
-repository locally and use poetry to setup a development environment.
+For a development environment, `pwncat` uses Python Poetry. You can clone the
+repository locally and use Poetry to set up a development environment:
 
-``` shell
-# Setup pwncat inside a poetry-managed virtual environment
-git clone git@github.com:calebstewart/pwncat.git
-cd pwncat
+```shell
+# Setup pwncat-vl inside a poetry-managed virtual environment
+git clone https://github.com/Chocapikk/pwncat-vl.git
+cd pwncat-vl
 poetry install
 
 # Enter the virtual environment
@@ -82,15 +115,9 @@ poetry shell
 
 ## Naming Changes
 
-Due to the naming conflict with [Cytopia's pwncat](https://pwncat.org/), I have
-decided to rename the package to `pwncat-cs`. This includes renaming the
-entrypoint so that there are no direct conflicts with Cytopia's project. If you
-are updating from `v0.4.*`, the command name will now have changed, and the `pcat`
-and `pc` varianst have been removed. See the most recent release notes for more
-details.
-
-The added benefit of this move is that the project is now pushed to PyPI for
-easier installation/updating in the future.
+Due to naming conflicts with [Cytopia's pwncat](https://pwncat.org/), the original project was renamed `pwncat-cs`.  
+This fork continues under the name **`pwncat-vl`**, and uses the same `pwncat-cs` entrypoint for now,  
+but a future update might adjust that for clarity and independence.
 
 ## Windows Support
 
@@ -126,16 +153,6 @@ post-exploitation platforms. You can utilize the familiar `run`, `search`
 and `info` commands and enter module contexts with the `use` command.
 Refer to the documentation for more information.
 
-## BlackArch Packaging
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/pwncat-caleb.svg)](https://repology.org/project/pwncat-caleb/versions)
-
-Installation on BlackArch is as simple as:
-
-``` shell
-pacman -Syu pwncat-caleb
-```
-
 ### Connecting to a Victim
 
 The command line parameters for pwncat attempt to be flexible and accept
@@ -144,43 +161,43 @@ common netcat and ssh like syntax. The following are all valid:
 
 ```sh
 # Connect to a bind shell
-pwncat-cs connect://10.10.10.10:4444
-pwncat-cs 10.10.10.10:4444
-pwncat-cs 10.10.10.10 4444
+pwncat-vl connect://10.10.10.10:4444
+pwncat-vl 10.10.10.10:4444
+pwncat-vl 10.10.10.10 4444
 # Listen for reverse shell
-pwncat-cs bind://0.0.0.0:4444
-pwncat-cs 0.0.0.0:4444
-pwncat-cs :4444
-pwncat-cs -lp 4444
+pwncat-vl bind://0.0.0.0:4444
+pwncat-vl 0.0.0.0:4444
+pwncat-vl :4444
+pwncat-vl -lp 4444
 # Connect via ssh
-pwncat-cs ssh://user:password@10.10.10.10
-pwncat-cs user@10.10.10.10
-pwncat-cs user:password@10.10.10.10
-pwncat-cs -i id_rsa user@10.10.10.10
+pwncat-vl ssh://user:password@10.10.10.10
+pwncat-vl user@10.10.10.10
+pwncat-vl user:password@10.10.10.10
+pwncat-vl -i id_rsa user@10.10.10.10
 # SSH w/ non-standard port
-pwncat-cs -p 2222 user@10.10.10.10
-pwncat-cs user@10.10.10.10:2222
+pwncat-vl -p 2222 user@10.10.10.10
+pwncat-vl user@10.10.10.10:2222
 # Reconnect utilizing installed persistence
 #   If reconnection fails and no protocol is specified,
 #   SSH is used as a fallback.
-pwncat-cs reconnect://user@10.10.10.10
-pwncat-cs reconnect://user@c228fc49e515628a0c13bdc4759a12bf
-pwncat-cs user@10.10.10.10
-pwncat-cs c228fc49e515628a0c13bdc4759a12bf
-pwncat-cs 10.10.10.10
+pwncat-vl reconnect://user@10.10.10.10
+pwncat-vl reconnect://user@c228fc49e515628a0c13bdc4759a12bf
+pwncat-vl user@10.10.10.10
+pwncat-vl c228fc49e515628a0c13bdc4759a12bf
+pwncat-vl 10.10.10.10
 ```
 
 By default, pwncat **assumes the target platform is Linux**. In order to
 connect to a Windows reverse or bind shell, you must pass the `--platform/-m`
 argument:
 
-``` shell
-pwncat-cs -m windows 10.10.10.10 4444
-pwncat-cs -m windows -lp 4444
+```shell
+pwncat-vl -m windows 10.10.10.10 4444
+pwncat-vl -m windows -lp 4444
 ```
 
 For more information on the syntax and argument handling, see the
-help information with ``pwncat-cs --help`` or visit the [documentation].
+help information with ``pwncat-vl --help`` or visit the [documentation].
 
 ## Docker Image
 

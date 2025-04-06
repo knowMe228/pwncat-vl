@@ -14,6 +14,7 @@ utilize this class to instantiate a session via an established socket.
         session = manager.create_connection(platform="linux", protocol="socket", client=sock)
         manager.interactive()
 """
+
 import os
 import ssl
 import errno

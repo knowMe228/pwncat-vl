@@ -97,15 +97,11 @@ class Module(BaseModule):
             use_platform = False
 
         env.filters["first_or_none"] = lambda thing: thing[0] if thing else None
-        env.filters["attr_or"] = (
-            lambda fact, name, default=None: getattr(fact, name)
-            if fact is not None
-            else default
+        env.filters["attr_or"] = lambda fact, name, default=None: (
+            getattr(fact, name) if fact is not None else default
         )
-        env.filters["title_or_unknown"] = (
-            lambda fact: strip_markup(fact.title(session))
-            if fact is not None
-            else "unknown"
+        env.filters["title_or_unknown"] = lambda fact: (
+            strip_markup(fact.title(session)) if fact is not None else "unknown"
         )
         env.filters["remove_rich"] = lambda thing: strip_markup(str(thing))
         env.filters["table"] = self.generate_markdown_table

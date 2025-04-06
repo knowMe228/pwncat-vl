@@ -23,6 +23,7 @@ get an asynchronous notification of new sessions, you can use the ``established`
 callback which receives the new session as an argument.
 
 """
+
 import os
 import ssl
 import sys
@@ -389,7 +390,8 @@ class Listener(threading.Thread):
 
     def _ssl_wrap(self, server: socket.socket) -> ssl.SSLSocket:
         """Wrap the given server socket in an SSL context and return the new socket.
-        If the ``ssl`` option is not set, this method simply returns the original socket."""
+        If the ``ssl`` option is not set, this method simply returns the original socket.
+        """
 
         if not self.ssl:
             return server
@@ -930,7 +932,9 @@ class Manager:
         take its place in the module list. This includes built-in modules.
         """
 
-        for loader, module_name, is_pkg in pkgutil.walk_packages(paths, prefix="pwncat.modules."):
+        for loader, module_name, is_pkg in pkgutil.walk_packages(
+            paths, prefix="pwncat.modules."
+        ):
             # Locate the module spec
             spec = importlib.util.find_spec(module_name)
             if spec is None:
@@ -953,7 +957,6 @@ class Manager:
             short_name = module_name.split("pwncat.modules.", 1)[1]
             self.modules[short_name] = module.Module()
             self.modules[short_name].name = short_name
-
 
     def log(self, *args, **kwargs):
         """Output a log entry"""

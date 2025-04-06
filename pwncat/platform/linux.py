@@ -10,6 +10,7 @@ Popen can be running at a time. It is imperative that you call
 ``Popen.wait`` or wait for ``Popen.poll`` to return non-Null prior
 to calling any other pwncat methods.
 """
+
 import os
 import stat
 import time
@@ -228,7 +229,7 @@ class PopenLinux(pwncat.subprocess.Popen):
             return
 
         # Terminate the process (SIGQUIT)
-        self.platform.channel.send(b"\x1C\x1C")
+        self.platform.channel.send(b"\x1c\x1c")
         self.returncode = -1
         self.platform.command_running = None
 
@@ -332,7 +333,7 @@ class LinuxReader(BufferedIOBase):
         """Close the file and stop the process"""
 
         if self.popen is None:
-            raise UnsupportedOperation("reader is detached")
+            return
 
         if self.on_close is not None:
             self.on_close(self)

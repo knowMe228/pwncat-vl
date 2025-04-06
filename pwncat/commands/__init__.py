@@ -34,6 +34,7 @@ Example Custom Command
         def run(self, manager: "pwncat.manager.Manager", args: "argparse.Namespace"):
             manager.log("we ran a custom command!")
 """
+
 import os
 import re
 import sys
@@ -792,7 +793,8 @@ class CommandParser:
 
 class CommandLexer(RegexLexer):
     """Implements a Regular Expression based pygments lexer for dynamically highlighting
-    the pwncat prompt during typing. The tokens are generated from command definitions."""
+    the pwncat prompt during typing. The tokens are generated from command definitions.
+    """
 
     tokens = {}
 

@@ -13,6 +13,7 @@ processes and open multiple files with this platform. However, you should be
 careful to cleanup all processes and files prior to return from your method
 or code as the C2 will not attempt to garbage collect file or process handles.
 """
+
 import sys
 import gzip
 import json

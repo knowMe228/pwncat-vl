@@ -32,7 +32,7 @@ RUN set -eux \
 
 # Copy installed packages from builder image
 COPY --from=builder /usr/local/lib/python3.9 /usr/local/lib/python3.9
-COPY --from=builder /usr/local/bin/pwncat-cs /usr/local/bin/pwncat-cs
+COPY --from=builder /usr/local/bin/pwncat-vl /usr/local/bin/pwncat-vl
 
 # Ensure we have the pwncat plugins downloaded
 RUN pwncat-cs --download-plugins
@@ -41,4 +41,4 @@ RUN pwncat-cs --download-plugins
 WORKDIR /work
 
 # Entrypoint is pwncat itself
-ENTRYPOINT ["pwncat-cs"]
+ENTRYPOINT ["pwncat-vl"]

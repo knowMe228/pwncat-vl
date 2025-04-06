@@ -7,6 +7,7 @@ A replace implant is also used to local escalation but instead
 replaces the context of the current session with a different user.
 Lastly, a remote implant allows pwncat to reconnect to the target.
 """
+
 import enum
 from typing import List, Union, Callable
 

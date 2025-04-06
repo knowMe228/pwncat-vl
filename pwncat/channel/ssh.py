@@ -6,6 +6,7 @@ shell and grabs a PTY. It then wraps the SSH channel in a pwncat channel.
 This module requires a host, user and either a password or identity (key) file.
 An optional port argument is also accepted.
 """
+
 import os
 import socket
 from typing import Union, TextIO, Optional

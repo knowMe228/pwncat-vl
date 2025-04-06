@@ -6,6 +6,7 @@ This module also defines classes and methods which make building abilities
 from GTFOBins methods simpler, since they are used in multiple places within
 pwncat.
 """
+
 import functools
 import subprocess
 from io import TextIOWrapper

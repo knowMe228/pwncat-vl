@@ -31,6 +31,7 @@ Example Module
             session.log(f"ran {self.name}")
 
 """
+
 import typing
 import inspect
 import functools

@@ -59,6 +59,7 @@ Example Enumerate Module
             yield CustomFactObject(self.name)
 
 """
+
 import typing
 import fnmatch
 from enum import Enum, auto

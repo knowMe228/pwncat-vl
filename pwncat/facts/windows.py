@@ -1,6 +1,7 @@
 """
 Windows-specific facts which are used in multiple places throughout the framework.
 """
+
 from enum import IntFlag
 from typing import List, Callable, Optional
 from datetime import datetime

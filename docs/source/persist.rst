@@ -69,7 +69,7 @@ To list all installed remote implants, use the ``--list`` argument:
 
 .. code-block:: bash
 
-   $ pwncat-cs --list
+   $ pwncat-vl --list
                                     ╷                ╷          ╷                                       ╷
    ID                               │ Address        │ Platform │ Implant                               │ User
    ══════════════════════════════════╪════════════════╪══════════╪═══════════════════════════════════════╪═══════
@@ -79,7 +79,7 @@ When attempting to reconnect, you only need to provide the unique host ID from t
 
 .. code-block:: bash
 
-   $ pwncat-cs ab8b7df2a1f83fa6694b0315aaf1deec
+   $ pwncat-vl ab8b7df2a1f83fa6694b0315aaf1deec
    [03:08:13] Welcome to pwncat 🐈!
               trigger implant: linux.implant.authorized_key
    [03:08:18] 192.168.10.100:22: loaded known host from db

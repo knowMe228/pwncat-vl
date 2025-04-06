@@ -6,6 +6,7 @@ class which is stored verbatim in the database. For documentation
 on how to create persistent classes, please see the ZODB
 documentation.
 """
+
 from typing import Optional
 
 import persistent
