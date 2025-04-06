@@ -6,15 +6,101 @@ from rich.progress import (
     Progress,
     BarColumn,
     TextColumn,
-    DownloadColumn,
     TimeRemainingColumn,
-    TransferSpeedColumn,
+    SpinnerColumn,
 )
 
 import pwncat
 from pwncat import util
 from pwncat.util import console
 from pwncat.commands import Complete, Parameter, CommandDefinition
+
+
+def download_file_base(remote_path, local_path):
+    """
+    Download a file from remote_path to local_path.
+    Returns a tuple (elapsed, error) where elapsed is the time taken (in seconds)
+    if successful, and error is a complete error message (or None if successful).
+    """
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+    start_time = time.time()
+    try:
+        with open(local_path, "wb") as lf, remote_path.open("rb") as rf:
+            for buf in iter(lambda: rf.read(4096), b""):
+                lf.write(buf)
+        elapsed = time.time() - start_time
+        return elapsed, None
+    except Exception as e:
+        return None, f"{remote_path}: {e}"
+
+
+def download_file_recursive(remote_path, local_path, task_id, progress, download_errors):
+    """
+    Download a file in recursive mode.
+    Always advances the progress bar (advance=1) regardless of outcome.
+    Records any error (with full error message) in download_errors.
+    """
+    _, error = download_file_base(remote_path, local_path)
+    progress.update(task_id, advance=1)
+    if error:
+        download_errors.append(error)
+    return error
+
+
+def download_file_single(remote_path, local_path):
+    """
+    Download a single file.
+    If successful, prints the file's name, its size, and download time.
+    """
+    elapsed, error = download_file_base(remote_path, local_path)
+    if error:
+        console.log(f"[red]Error downloading {remote_path}: {error}[/red]")
+    else:
+        size = util.human_readable_size(remote_path.stat().st_size)
+        console.log(f"Downloaded {remote_path} ({size}) in [green]{util.human_readable_delta(elapsed)}[/green] \u2192 {local_path}")
+    return error
+
+
+def get_all_entries(start_dir):
+    """
+    Walk the directory tree in a single pass using a stack.
+    Collect all directories and, from each, the files that are downloadable.
+    
+    :param start_dir: A pwncat Path object representing the remote start directory.
+    :return: A tuple (directories, files)
+    """
+    directories = []
+    files = []
+    stack = [start_dir]
+    visited = set()
+
+    # download_errors is assumed to be in the outer scope.
+    while stack:
+        current = stack.pop()
+        rstr = str(current)
+        if rstr in visited:
+            continue
+        visited.add(rstr)
+        try:
+            entries = list(current.iterdir())
+        except Exception as e:
+            console.log(f"[red]Error listing directory {current}: {e}[/red]")
+            continue
+
+        directories.append(current)
+        for entry in entries:
+            child_name = os.path.basename(str(entry))
+            if child_name in {".", ".."}:
+                continue
+            try:
+                if entry.is_dir():
+                    stack.append(entry)
+                else:
+                    entry.stat()  # verify file accessibility
+                    files.append(entry)
+            except Exception as e:
+                download_errors.append(f"{entry}: {e}")
+    return directories, files
 
 
 class Command(CommandDefinition):
@@ -24,8 +110,11 @@ class Command(CommandDefinition):
     recursively download its contents into the local destination,
     preserving the remote subdirectory structure.
 
-    The top-level remote directory is not recreated inside the destination;
-    only its contents (and subdirectories) are downloaded.
+    In recursive mode, a global progress bar (based on the total number of files)
+    is updated for every file processed. At the end, a summary is printed indicating
+    the number of files successfully downloaded and the number skipped due to errors,
+    followed by the full error messages.
+    For a single file download, the file's name, size, and download time are displayed.
     """
 
     PROG = "download"
@@ -41,161 +130,66 @@ class Command(CommandDefinition):
         """
         Execute the download command.
 
-        For a single file, download the remote file to the specified local destination.
-        For directories (when --recursive is provided), recursively traverse the remote
-        directory, compute total size and file count, then download all files using a
-        single global progress bar. At the end, a summary is printed.
-
-        :param manager: The pwncat manager object.
-        :param args: Command line arguments.
+        - For a single file: download it and display its name, size, and download time.
+        - For directories: first display a spinner while performing a single-pass
+          listing of the directory tree, then download each file while preserving
+          the directory structure. A global progress bar is updated for every file,
+          and a final summary is printed.
         """
-        # Global progress bar for all downloads.
-        progress = Progress(
-            TextColumn("[bold cyan]{task.fields[filename]}", justify="right"),
-            BarColumn(bar_width=None),
-            "[progress.percentage]{task.percentage:>3.1f}%",
-            "•",
-            DownloadColumn(),
-            "•",
-            TransferSpeedColumn(),
-            "•",
-            TimeRemainingColumn(),
-        )
-
-        # Compute the total size and file count recursively.
-        def compute_totals(remote_dir, visited=None):
-            """
-            Recursively compute the total size and file count of all files within a remote directory.
-
-            :param remote_dir: A pwncat Path object representing a remote directory.
-            :param visited: A set to track visited directories (to avoid infinite recursion).
-            :return: A tuple (total_size, file_count).
-            """
-            if visited is None:
-                visited = set()
-            rstr = str(remote_dir)
-            if rstr in visited:
-                return 0, 0
-            visited.add(rstr)
-
-            # Process files in the current directory.
-            files = [
-                child
-                for child in remote_dir.iterdir()
-                if not child.is_dir()
-                and os.path.basename(str(child)) not in {".", ".."}
-            ]
-            total_size = sum(child.stat().st_size for child in files if child.stat())
-            file_count = len(files)
-
-            # Process subdirectories.
-            for child in remote_dir.iterdir():
-                if child.is_dir() and os.path.basename(str(child)) not in {".", ".."}:
-                    sub_size, sub_count = compute_totals(child, visited)
-                    total_size += sub_size
-                    file_count += sub_count
-
-            return total_size, file_count
-
-        # Download a single file and update the global progress.
-        def download_file(remote_path, local_path, task_id, display_name):
-            os.makedirs(os.path.dirname(local_path), exist_ok=True)
-            start_time = time.time()
-            with open(local_path, "wb") as lf, remote_path.open("rb") as rf:
-                for buf in iter(lambda: rf.read(4096), b""):
-                    lf.write(buf)
-                    progress.update(task_id, advance=len(buf), filename=display_name)
-            elapsed = time.time() - start_time
-            console.log(
-                f"downloaded [cyan]{util.human_readable_size(remote_path.stat().st_size)}[/cyan] in [green]{util.human_readable_delta(elapsed)}[/green] \u2192 {local_path}"
-            )
-
-        def traverse_and_download(
-            remote_dir, local_base, base_remote, task_id, visited, file_list
-        ):
-            """
-            Recursively traverse the remote directory and download all files,
-            preserving the directory structure relative to base_remote.
-
-            :param remote_dir: A pwncat Path object for the current remote directory.
-            :param local_base: The local destination base directory.
-            :param base_remote: The string representation of the base remote directory.
-            :param task_id: The global progress task ID.
-            :param visited: A set of visited remote directory paths to avoid infinite recursion.
-            :param file_list: A list to collect the paths of downloaded files.
-            """
-            remote_str = str(remote_dir)
-            if remote_str in visited:
-                return
-            visited.add(remote_str)
-
-            for child in remote_dir.iterdir():
-                child_name = os.path.basename(str(child))
-                if child_name in [".", ".."]:
-                    continue
-                relative_path = os.path.relpath(str(child), base_remote)
-                local_child = os.path.join(local_base, relative_path)
-                if child.is_dir():
-                    os.makedirs(local_child, exist_ok=True)
-                    traverse_and_download(
-                        child, local_base, base_remote, task_id, visited, file_list
-                    )
-                else:
-                    download_file(child, local_child, task_id, relative_path)
-                    file_list.append(local_child)
+        download_errors = []
 
         try:
             remote = manager.target.platform.Path(args.source)
-
             if remote.is_dir():
                 if not args.recursive:
-                    self.parser.error(
-                        "Source is a directory. Use --recursive to download it recursively."
-                    )
-
-                # Use the basename of the remote directory if no destination is provided.
+                    self.parser.error("Source is a directory. Use --recursive to download it recursively.")
                 if not args.destination:
                     args.destination = os.path.basename(args.source)
                 os.makedirs(args.destination, exist_ok=True)
 
-                total_size, file_count = compute_totals(remote, set())
-                console.log(
-                    f"Total size to download: {total_size} bytes in {file_count} files."
-                )
+                # Display a spinner progress bar for directory listing.
+                console.log(f"Starting single-pass listing for: {remote}")
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[bold cyan]{task.description}"),
+                    transient=True,
+                ) as listing_progress:
+                    task = listing_progress.add_task("Listing directories...", total=None)
+                    directories, file_list = get_all_entries(remote)
+                    listing_progress.stop()
+                total_files = len(file_list)
+                console.log(f"Ready to download: {len(directories)} directories and {total_files} downloadable files.")
 
-                downloaded_files = []
-                with progress:
-                    task_id = progress.add_task(
-                        "download", filename="", total=total_size, start=True
-                    )
-                    traverse_and_download(
-                        remote,
-                        args.destination,
-                        str(remote),
-                        task_id,
-                        set(),
-                        downloaded_files,
-                    )
+                downloaded_count = 0
+                skipped_count = 0
 
-                console.log(
-                    f"Finished downloading {len(downloaded_files)} files ({util.human_readable_size(total_size)} total)."
-                )
+                with Progress(
+                    TextColumn("[bold cyan]{task.fields[status]}", justify="right"),
+                    BarColumn(bar_width=None),
+                    "[progress.percentage]{task.percentage:>3.1f}%",
+                    "\u2022",
+                    TimeRemainingColumn(),
+                ) as progress:
+                    task_id = progress.add_task("download", status="Downloading files", total=total_files, start=True)
+                    for file_entry in file_list:
+                        relative_path = os.path.relpath(str(file_entry), str(remote))
+                        local_path = os.path.join(args.destination, relative_path)
+                        error = download_file_recursive(file_entry, local_path, task_id, progress, download_errors)
+                        if error is None:
+                            downloaded_count += 1
+                        else:
+                            skipped_count += 1
+
+                console.log(f"Finished downloading {downloaded_count} files, skipped {skipped_count} files.")
+                if download_errors:
+                    console.log("The following errors occurred during download:")
+                    for err in download_errors:
+                        console.log(f"    {err}")
             else:
-                # Handle single file download.
                 if not args.destination:
                     args.destination = os.path.basename(args.source)
                 elif os.path.isdir(args.destination):
-                    args.destination = os.path.join(
-                        args.destination, os.path.basename(args.source)
-                    )
-
-                total_size = remote.stat().st_size
-                with progress:
-                    task_id = progress.add_task(
-                        "download", filename=str(remote), total=total_size, start=True
-                    )
-                    download_file(remote, args.destination, task_id, str(remote))
-
-                console.log(f"Finished downloading file: {args.destination}")
+                    args.destination = os.path.join(args.destination, os.path.basename(args.source))
+                download_file_single(remote, args.destination)
         except (FileNotFoundError, PermissionError, IsADirectoryError) as exc:
             self.parser.error(str(exc))

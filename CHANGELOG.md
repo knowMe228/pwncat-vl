@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.5] - 2023-04-06
+## [0.5.6] - 2025-04-06
+### Fixed
+- Fixed recursive downloads showing one progress bar per file. Now a single global progress bar tracks the entire operation.
+
+### Improved
+- Recursive downloads now scale better for large directory trees, with clearer output and no redundant logs.
+
+## [0.5.5] - 2025-04-06
 ### Added
 - Added support for recursive directory downloads in the `download` command. Now, the contents
   (and subdirectories) of a remote directory are downloaded into the specified destination
   without duplicating the base directory.
-- Prevented infinite recursion by skipping \u201c.\u201d and \u201c..\u201d entries and using a visited set.
+- Prevented infinite recursion by skipping `.` and `..` entries and using a visited set.
 - Marked the initial release of the hard fork, introducing these new features and improvements.
 
 ### Changed
