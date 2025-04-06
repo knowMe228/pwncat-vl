@@ -6,8 +6,8 @@ from rich.progress import (
     Progress,
     BarColumn,
     TextColumn,
-    TimeRemainingColumn,
     SpinnerColumn,
+    TimeRemainingColumn,
 )
 
 import pwncat
@@ -34,7 +34,9 @@ def download_file_base(remote_path, local_path):
         return None, f"{remote_path}: {e}"
 
 
-def download_file_recursive(remote_path, local_path, task_id, progress, download_errors):
+def download_file_recursive(
+    remote_path, local_path, task_id, progress, download_errors
+):
     """
     Download a file in recursive mode.
     Always advances the progress bar (advance=1) regardless of outcome.
@@ -57,7 +59,9 @@ def download_file_single(remote_path, local_path):
         console.log(f"[red]Error downloading {remote_path}: {error}[/red]")
     else:
         size = util.human_readable_size(remote_path.stat().st_size)
-        console.log(f"Downloaded {remote_path} ({size}) in [green]{util.human_readable_delta(elapsed)}[/green] \u2192 {local_path}")
+        console.log(
+            f"Downloaded {remote_path} ({size}) in [green]{util.human_readable_delta(elapsed)}[/green] \u2192 {local_path}"
+        )
     return error
 
 
@@ -65,7 +69,7 @@ def get_all_entries(start_dir):
     """
     Walk the directory tree in a single pass using a stack.
     Collect all directories and, from each, the files that are downloadable.
-    
+
     :param start_dir: A pwncat Path object representing the remote start directory.
     :return: A tuple (directories, files)
     """
@@ -142,7 +146,9 @@ class Command(CommandDefinition):
             remote = manager.target.platform.Path(args.source)
             if remote.is_dir():
                 if not args.recursive:
-                    self.parser.error("Source is a directory. Use --recursive to download it recursively.")
+                    self.parser.error(
+                        "Source is a directory. Use --recursive to download it recursively."
+                    )
                 if not args.destination:
                     args.destination = os.path.basename(args.source)
                 os.makedirs(args.destination, exist_ok=True)
@@ -154,11 +160,15 @@ class Command(CommandDefinition):
                     TextColumn("[bold cyan]{task.description}"),
                     transient=True,
                 ) as listing_progress:
-                    task = listing_progress.add_task("Listing directories...", total=None)
+                    task = listing_progress.add_task(
+                        "Listing directories...", total=None
+                    )
                     directories, file_list = get_all_entries(remote)
                     listing_progress.stop()
                 total_files = len(file_list)
-                console.log(f"Ready to download: {len(directories)} directories and {total_files} downloadable files.")
+                console.log(
+                    f"Ready to download: {len(directories)} directories and {total_files} downloadable files."
+                )
 
                 downloaded_count = 0
                 skipped_count = 0
@@ -170,17 +180,26 @@ class Command(CommandDefinition):
                     "\u2022",
                     TimeRemainingColumn(),
                 ) as progress:
-                    task_id = progress.add_task("download", status="Downloading files", total=total_files, start=True)
+                    task_id = progress.add_task(
+                        "download",
+                        status="Downloading files",
+                        total=total_files,
+                        start=True,
+                    )
                     for file_entry in file_list:
                         relative_path = os.path.relpath(str(file_entry), str(remote))
                         local_path = os.path.join(args.destination, relative_path)
-                        error = download_file_recursive(file_entry, local_path, task_id, progress, download_errors)
+                        error = download_file_recursive(
+                            file_entry, local_path, task_id, progress, download_errors
+                        )
                         if error is None:
                             downloaded_count += 1
                         else:
                             skipped_count += 1
 
-                console.log(f"Finished downloading {downloaded_count} files, skipped {skipped_count} files.")
+                console.log(
+                    f"Finished downloading {downloaded_count} files, skipped {skipped_count} files."
+                )
                 if download_errors:
                     console.log("The following errors occurred during download:")
                     for err in download_errors:
@@ -189,7 +208,9 @@ class Command(CommandDefinition):
                 if not args.destination:
                     args.destination = os.path.basename(args.source)
                 elif os.path.isdir(args.destination):
-                    args.destination = os.path.join(args.destination, os.path.basename(args.source))
+                    args.destination = os.path.join(
+                        args.destination, os.path.basename(args.source)
+                    )
                 download_file_single(remote, args.destination)
         except (FileNotFoundError, PermissionError, IsADirectoryError) as exc:
             self.parser.error(str(exc))
