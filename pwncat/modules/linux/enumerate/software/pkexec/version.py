@@ -31,9 +31,7 @@ class PkexecVersion(Fact):
         result = self.output
         if self.vulnerable:
             result = result.rstrip("\n") + "\n\n"
-            result += (
-                'This version is likely vulnerable to [red]CVE-2021-4034[/red] (PwnKit).'
-            )
+            result += "This version is likely vulnerable to [red]CVE-2021-4034[/red] (PwnKit)."
         return result
 
 

@@ -776,7 +776,9 @@ class Session:
 
         # Unwrap all layers in the session
         while self.layers:
-            self.layers.pop()(self)
+            layer = self.layers.pop()
+            if callable(layer):
+                layer(self)
 
         try:
             self.platform.exit()

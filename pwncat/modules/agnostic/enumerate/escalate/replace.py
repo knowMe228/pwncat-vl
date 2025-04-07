@@ -12,7 +12,6 @@ class DirectReplaceAbility(EscalationReplace):
         self.ability: ExecuteAbility = ability
 
     def escalate(self, session: "pwncat.manager.Session"):
-
         return self.ability.shell(session)
 
     def title(self, session: "pwncat.manager.Session"):

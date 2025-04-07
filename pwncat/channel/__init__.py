@@ -24,6 +24,15 @@ import pwncat
 CHANNEL_TYPES = {}
 
 
+class SafeBufferedWriter(BufferedWriter):
+    def flush(self):
+        try:
+            super().flush()
+        except ValueError as e:
+            if "flush of closed file" not in str(e):
+                raise
+
+
 class ChannelError(Exception):
     """Generic failure of a channel operation.
 
@@ -493,7 +502,7 @@ class Channel(ABC):
         :return: A file-like object suitable for the specified mode
         :rtype: Union[BinaryIO, TextIO]
         :raises:
-          ValueError: both "r" and "w" were specified or invalid characters were found in mode
+        ValueError: both "r" and "w" were specified or invalid characters were found in mode
         """
 
         if mode != "r" and mode != "w":
@@ -507,7 +516,7 @@ class Channel(ABC):
         if mode == "r":
             return BufferedReader(raw_io, buffer_size=bufsize)
         else:
-            return BufferedWriter(raw_io, buffer_size=bufsize)
+            return SafeBufferedWriter(raw_io, buffer_size=bufsize)
 
     def recvinto(self, b):
         raise NotImplementedError
