@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.9] - 2025-07-06
+
+### Added
+
+- New privilege‑escalation module leveraging **CVE‑2025‑32463** (sudo *‑R* NSS‑preload). Detects vulnerable sudo ≥ 1.9.14 < 1.9.17 and drops a root shell via the original *sudo‑chwoot* technique.
+
 ## [0.5.8] - 2025-04-06  
 ### Fixed  
 - Silently ignored unsafe `flush of closed file` errors caused by `BufferedWriter`, improving stability during privilege escalation and enumeration modules.  

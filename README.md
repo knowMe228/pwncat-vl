@@ -258,7 +258,6 @@ Pull requests are welcome!
 **pwncat** would like to be come a red team swiss army knife. Hopefully soon,
 more features will be added.
 
-* More privilege escalation methods (sudo -u#-1 CVE, LXD containers, etc.)
 * Persistence methods (bind shell, cronjobs, SSH access, PAM abuse, etc.)
 * Aggression methods (spam randomness to terminals, flush firewall, etc.)
 * Meme methods (terminal-parrot, cowsay, wall, etc.)
