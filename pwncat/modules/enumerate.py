@@ -290,3 +290,27 @@ class EnumerateModule(BaseModule):
         :param session: the session on which to enumerate
         :type session: pwncat.manager.Session
         """
+
+
+class Module(EnumerateModule):
+    """
+    Generic enumerate module that returns cached facts based on requested types.
+    This module provides a way to retrieve previously enumerated facts without
+    performing new enumeration. It's used during session cleanup to check for
+    specific fact types like tamper and implant facts.
+    """
+
+    PLATFORM = None  # Works on all platforms
+    PROVIDES = []  # Generic module - works with all fact types
+    SCOPE = Scope.HOST
+    SCHEDULE = Schedule.ALWAYS  # Always just return cached facts
+
+    def enumerate(self, session):
+        """
+        This method is not directly used since we're only returning cached facts.
+        The base class handles returning cached facts when cache=True.
+        """
+        # Do nothing - all logic is handled by base class run() method
+        # when returning cached facts
+        return
+        yield  # Make this a generator that yields nothing

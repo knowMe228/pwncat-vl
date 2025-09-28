@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+"""
+Agnostic enumerate modules
+"""
 
-# Alias `run enumerate` to `run enumerate.gather`
-from pwncat.modules.agnostic.enumerate.gather import Module  # noqa: F401
+from pwncat.modules.agnostic.enumerate import hello_world
